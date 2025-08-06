@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estrattore SuperEnalotto</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Stile personalizzato per i cerchi dei numeri */
+        .number-circle {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.25rem; /* text-xl */
+            color: white;
+            background-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .number-circle:hover {
+            transform: scale(1.05);
+        }
+
+        .jolly-circle {
+            background-color: #ef4444; /* red-500 */
+        }
+
+        .superstar-circle {
+            background-color: #22c55e; /* green-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 font-sans">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl text-center">
+        <h1 class="text-4xl font-extrabold text-blue-800 mb-8">Estrattore SuperEnalotto</h1>
+
+        <!-- Sezione Numeri Principali -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Numeri Principali (1-90)</h2>
+            <div id="mainNumbers" class="flex flex-wrap justify-center gap-4">
+                <!-- I numeri principali verranno inseriti qui -->
+            </div>
+        </div>
+
+        <!-- Sezione Numero Jolly -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Numero Jolly (1-90)</h2>
+            <div id="jollyNumber" class="flex justify-center">
+                <!-- Il numero Jolly verrà inserito qui -->
+            </div>
+        </div>
+
+        <!-- Sezione Numero SuperStar -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Numero SuperStar (1-90)</h2>
+            <div id="superstarNumber" class="flex justify-center">
+                <!-- Il numero SuperStar verrà inserito qui -->
+            </div>
+        </div>
+
+        <!-- Pulsante Genera Numeri -->
+        <button id="generateBtn" class="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+            Genera Numeri
+        </button>
+    </div>
+
+    <script>
+        // Funzione per generare un numero casuale tra min e max (inclusi)
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Funzione per generare numeri unici
+        function generateUniqueNumbers(count, min, max, exclude = []) {
+            const numbers = new Set(exclude); // Inizializza con i numeri da escludere
+            while (numbers.size < count + exclude.length) {
+                const num = getRandomNumber(min, max);
+                numbers.add(num);
+            }
+            // Rimuovi i numeri esclusi dal set finale per ottenere solo i nuovi numeri unici
+            const newNumbers = Array.from(numbers).filter(num => !exclude.includes(num)).slice(0, count);
+            return newNumbers;
+        }
+
+        // Funzione per visualizzare i numeri
+        function displayNumbers(elementId, numbers, circleClass = 'number-circle') {
+            const container = document.getElementById(elementId);
+            container.innerHTML = ''; // Pulisce i numeri precedenti
+            numbers.forEach(num => {
+                const div = document.createElement('div');
+                div.className = `${circleClass} flex-shrink-0`; // Aggiunge flex-shrink-0 per prevenire il rimpicciolimento
+                div.textContent = num;
+                container.appendChild(div);
+            });
+        }
+
+        // Funzione principale per generare tutti i numeri del SuperEnalotto
+        function generateSuperEnalottoNumbers() {
+            // Genera 6 numeri principali unici da 1 a 90
+            const mainNumbers = generateUniqueNumbers(6, 1, 90).sort((a, b) => a - b);
+            displayNumbers('mainNumbers', mainNumbers);
+
+            // Genera il numero Jolly, unico rispetto ai numeri principali
+            const jollyNumber = generateUniqueNumbers(1, 1, 90, mainNumbers)[0];
+            displayNumbers('jollyNumber', [jollyNumber], 'number-circle jolly-circle');
+
+            // Genera il numero SuperStar, da 1 a 90 (può essere uguale agli altri)
+            const superstarNumber = getRandomNumber(1, 90);
+            displayNumbers('superstarNumber', [superstarNumber], 'number-circle superstar-circle');
+        }
+
+        // Aggiunge l'event listener al pulsante
+        document.getElementById('generateBtn').addEventListener('click', generateSuperEnalottoNumbers);
+
+        // Genera i numeri all'avvio della pagina
+        generateSuperEnalottoNumbers();
+    </script>
+</body>
+</html>
